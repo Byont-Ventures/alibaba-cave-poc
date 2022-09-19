@@ -1,72 +1,12 @@
-import React, {MutableRefObject, useRef, useState} from 'react';
+import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
 import './App.css';
 import {Canvas, ThreeElements, useFrame} from '@react-three/fiber'
 import THREE from 'three';
 import {OrbitControls, RoundedBox, Text} from '@react-three/drei';
-// import {Timer} fr
-// import {clearInterval} from "timers";
+import { Form } from 'react-bootstrap';
+import {Peggy} from "./Peggy";
 
-function actPath2(peggy: MutableRefObject<THREE.Mesh>, victor: MutableRefObject<THREE.Mesh>, time: number) {
 
-    if (peggy.current.position.x <= 2.1 && peggy.current.position.z >= -0.1 && peggy.current.position.z <= 0.1) {
-        let intervalId = setInterval(() => {
-            if (peggy.current.position.x >= 3) {
-                clearInterval(intervalId)
-                let intervalId2 = setInterval(() => {
-                    if (peggy.current.position.z >= 2.375) {
-                        clearInterval(intervalId2)
-                        let intervalId3 = setInterval(() => {
-                            if (peggy.current.position.x >= 5.8) {
-                                clearInterval(intervalId3)
-                                let intervalId4 = setInterval(() => {
-                                    if (peggy.current.position.z <= 1) {
-                                        clearInterval(intervalId4)
-                                        actVictor(victor, time)
-                                    }
-                                    peggy.current.position.z -= 0.1
-                                }, time)
-                            }
-                            peggy.current.position.x += 0.1
-                        }, time)
-                    }
-                    peggy.current.position.z += 0.1
-                }, time)
-            }
-            peggy.current.position.x += 0.1
-        }, time)
-    }
-}
-
-function actPath1(peggy: MutableRefObject<THREE.Mesh>, victor: MutableRefObject<THREE.Mesh>, time: number) {
-
-    if (peggy.current.position.x <= 2.1 && peggy.current.position.z >= -0.1 && peggy.current.position.z <= 0.1) {
-        let intervalId = setInterval(() => {
-            if (peggy.current.position.x >= 3) {
-                clearInterval(intervalId)
-                let intervalId2 = setInterval(() => {
-                    if (peggy.current.position.z <= -2.375) {
-                        clearInterval(intervalId2)
-                        let intervalId3 = setInterval(() => {
-                            if (peggy.current.position.x >= 5.8) {
-                                clearInterval(intervalId3)
-                                let intervalId4 = setInterval(() => {
-                                    if (peggy.current.position.z >= -1) {
-                                        clearInterval(intervalId4)
-                                        actVictor(victor, time)
-                                    }
-                                    peggy.current.position.z += 0.1
-                                }, time)
-                            }
-                            peggy.current.position.x += 0.1
-                        }, time)
-                    }
-                    peggy.current.position.z -= 0.1
-                }, time)
-            }
-            peggy.current.position.x += 0.1
-        }, time)
-    }
-}
 
 function actVictor(victor: MutableRefObject<THREE.Mesh>, time: number) {
     if (victor.current.position.x >= -1.6 && victor.current.position.z <= -1.9) {
@@ -155,7 +95,7 @@ function peggyReturns2(peggy: MutableRefObject<THREE.Mesh>, secretWord: boolean,
 
 function goThroughDoor(door: MutableRefObject<THREE.Mesh>, peggy: MutableRefObject<THREE.Mesh>, peggyPath: string, victorPath: string, secretWord: boolean, time: number) {
     let intervalId = setInterval(() => {
-        if (door.current.position.x <= 4.99) {
+        if (door.current.position.x <= 4.98) {
             clearInterval(intervalId)
             if (peggyPath === "B") {
                 peggyReturns1(peggy, secretWord, time)
@@ -165,19 +105,21 @@ function goThroughDoor(door: MutableRefObject<THREE.Mesh>, peggy: MutableRefObje
             }
             let intervalId2 = setInterval(() => {
                 if (peggy.current.position.z >= 2.375 || peggy.current.position.z <= -2.375 || peggy.current.position.z <= 3) {
-                    if (door.current.position.x >= 5.99) {
+                    if (door.current.position.x >= 5.98) {
                         clearInterval(intervalId2)
                     }
-                    door.current.position.x += 0.01
+                    door.current.position.x += 0.02
                 }
             }, time)
         }
-        door.current.position.x -= 0.01
+        door.current.position.x -= 0.02
     }, time)
 }
 
 function comeBack (door: MutableRefObject<THREE.Mesh>, peggy: MutableRefObject<THREE.Mesh>, peggyPath: string, victorPath: string, secretWord: boolean, time: number) {
 
+    console.log("This is a path for Peggy: ", peggyPath)
+    console.log("This is a path for Victor: ", victorPath)
     // if Peggy knows the Secret word, and she is not at the Path that called Victor, then she opens the door and goes to the right Path
     if (secretWord && victorPath !== peggyPath) {
         goThroughDoor(door, peggy, peggyPath, victorPath, secretWord, time)
@@ -253,6 +195,8 @@ function peggyReturnsOriginal (peggy: MutableRefObject<THREE.Mesh>, time: number
 function calculateConfidence(confidence: number, repetitions: number) {
     const newConf = confidence + 50 / Math.pow(2, repetitions)
     const newRep = repetitions + 1
+    console.log("New confidence equal: ", newConf)
+    console.log("New repetitions equal: ", newRep)
     return [newConf, newRep]
 }
 
@@ -267,18 +211,85 @@ function App() {
     const [repetitions, setRepetitions] = useState(0)
     const [turboOn, turnTurbo] = useState(false)
     // let interval = setInterval(() => {console.log("something there")}, 1000)
-    const secretWord = true;
-    const peggy = useRef<THREE.Mesh>(null!)
+    const [secretWord, setSecretWord] = useState(true);
     const victor = useRef<THREE.Mesh>(null!)
     const door = useRef<THREE.Mesh>(null!)
     const victorChoice = useRef<THREE.Mesh>(null!)
+
+    // function executeTurbo() {
+    //     // Peggy chooses a path and follows it and Victor comes to the paths
+    //         interval = setInterval(() => {
+    //             console.log("Turbo is ON")
+    //             let peggyPathVar = ""
+    //             if (victor.current.position.x >= -1.6 && victor.current.position.z <= -1.9) {
+    //                 setPeggyPath("")
+    //                 const rand = Math.random()
+    //                 if (rand <= 0.5) {
+    //                     actPath1(peggy, victor, 20)
+    //                     peggyPathVar = "A"
+    //                 } else {
+    //                     actPath2(peggy, victor, 20)
+    //                     peggyPathVar = "B"
+    //                 }
+    //
+    //                 // let intervalId999 = setInterval(() => {
+    //                 //     if (peggyPath === peggyPathVar) {
+    //                 //         clearInterval(intervalId999)
+    //                 //         console.log("Finally set Peggy's Path: ", peggyPath)
+    //                 //     }
+    //                 //     console.log("Just spamming")
+    //                 //     setPeggyPath(peggyPathVar)
+    //                 // }, 5)
+    //
+    //
+    //                 // Peggy comes back
+    //                 let intervalId = setInterval(() => {
+    //                     if (victor.current.position.x >= 2) {
+    //                         clearInterval(intervalId)
+    //                         const victorPathVar = choosePathVictor(victor, victorChoice)
+    //                         setPathName(victorPathVar)
+    //                         comeBack(door, peggy, peggyPathVar, victorPathVar, secretWord, 20)
+    //                         // Calculation of confidence
+    //                         let calculated = false
+    //                         let intervalId2 = setInterval(() => {
+    //                             if (peggy.current.position.x <= 3 && !calculated) {
+    //                                 calculated = true
+    //                                 console.log("Got to the calculation")
+    //                                 clearInterval(intervalId2)
+    //                                 const response = victorResponds(peggyPathVar, victorPathVar, secretWord)
+    //                                 setPathName(response)
+    //                                 if (response === "Ok") {
+    //                                     const [newConf, newRep] = calculateConfidence(confidence, repetitions)
+    //                                     setConfidence(newConf)
+    //                                     setRepetitions(newRep)
+    //                                 } else {
+    //                                     setConfidence(0.0)
+    //                                     setRepetitions(0)
+    //                                     clearInterval(interval)
+    //                                     turnTurbo(false)
+    //                                 }
+    //                                 let intervalId10 = setInterval(() => {
+    //                                     if (victor.current.position.x >= 2 && peggy.current.position.x <= 3 && (peggy.current.position.z >= -1 && peggy.current.position.z <= 1)) {
+    //                                         clearInterval(intervalId10)
+    //                                         repeat(victor, peggy, victorChoice, 20)
+    //                                     }
+    //                                 }, 20)
+    //                             }
+    //                         }, 20)
+    //                     }
+    //                 }, 20)
+    //             }
+    //         }, 1000)
+    // }
+
+
     return (
       <div style={{height: '100vh'}}>
         <Canvas
             onClick={() => {
-                // console.log("clicked")
-                // clearInterval(interval)
-                repeat(victor, peggy, victorChoice, 10)
+                // if (!turboOn) {
+                //     repeat(victor, peggy, victorChoice, 10)
+                // }
             }}>
             <OrbitControls />
             <ambientLight />
@@ -296,6 +307,7 @@ function App() {
                 onClick={() => {
                     clickP1(!clickedP1)
                     clickP2(false)
+                    setPeggyPath("A")
                 } }
                 onPointerOut={() => hoverP1(false)}
                 onPointerOver={() => hoverP1(true)}>
@@ -326,41 +338,6 @@ function App() {
                 args={[2, 2.5, 4]}
                 position={[4.5, 0.99, 0]}
                 onClick={() => {
-                    turnTurbo(!turboOn)
-                    // @todo: need to implement Turbo using "interval" outside App function and stopping this interval with Turn off button
-                    interval = setInterval(() => {
-                        const rand = Math.random()
-                        if (rand <= 0.5) {
-                            actPath1(peggy, victor, 5)
-                            setPeggyPath("A")
-                        } else {
-                            actPath2(peggy, victor, 5)
-                            setPeggyPath("B")
-                        }
-                        let intervalId = setInterval(() => {
-                            if (victor.current.position.x >= 2) {
-                                clearInterval(intervalId)
-                                const letter = choosePathVictor(victor, victorChoice)
-                                setPathName(letter)
-                                comeBack(door, peggy, peggyPath, letter, secretWord, 5)
-                                let intervalId2 = setInterval(() => {
-                                    if (peggy.current.position.x <= 3) {
-                                        clearInterval(intervalId2)
-                                        const response = victorResponds(peggyPath, letter, secretWord)
-                                        setPathName(response)
-                                        if (response === "Ok") {
-                                            const [newConf, newRep] = calculateConfidence(confidence, repetitions)
-                                            setConfidence(newConf)
-                                            setRepetitions(newRep)
-                                        } else {
-                                            setConfidence(0.0)
-                                            setRepetitions(0)
-                                        }
-                                    }
-                                }, 5)
-                            }
-                        }, 5)
-                    }, 50)
 
             }}>
                 <meshStandardMaterial color={'brown'} />
@@ -380,22 +357,7 @@ function App() {
             </RoundedBox>
 
             {/*That's Peggy*/}
-            <RoundedBox
-                ref={peggy}
-                args={[0.75, 0.75, 0.75]}
-                position={[2, 1, 0]}
-                onClick={() => {
-                    if (clickedP1) {
-                        actPath1(peggy, victor, 10)
-                        setPeggyPath("A")
-                    }
-                    else if (clickedP2){
-                        actPath2(peggy, victor, 10)
-                        setPeggyPath("B")
-                    }
-                }}>
-                <meshStandardMaterial color={'red'} />
-            </RoundedBox>
+            <Peggy peggyPath={peggyPath}/>
 
             {/*That's Victor*/}
             <RoundedBox
@@ -406,9 +368,10 @@ function App() {
                     if (victor.current.position.x >= 2) {
                         const letter = choosePathVictor(victor, victorChoice)
                         setPathName(letter)
-                        comeBack(door, peggy, peggyPath, letter, secretWord, 10)
+                        // comeBack(door, peggy, peggyPath, letter, secretWord, 10)
                         let intervalId = setInterval(() => {
-                            if (peggy.current.position.x <= 3) {
+                            // if (peggy.current.position.x <= 3) {
+                                if (victor) {
                                 clearInterval(intervalId)
                                 const response = victorResponds(peggyPath, letter, secretWord)
                                 setPathName(response)
@@ -448,32 +411,34 @@ function App() {
         </Canvas>
           <button
               style={{height: "100px", width: "100px", backgroundColor: "#FEDCBA"}}
+              disabled={turboOn}
               onClick={() => {
-                  // turnTurbo(false)
-                  turnOn()
-                  console.log("pressed the button ON")
-              }}>Turn on</button>
+                  turnTurbo(true)
+                  // executeTurbo()
+              }}>Turn on Turbo</button>
 
           <button
               style={{height: "100px", width: "100px", backgroundColor: "#ABCDEF"}}
               onClick={() => {
-              // turnTurbo(false)
+                  turnTurbo(false)
                   turnOff()
-              console.log("pressed the button OFF")
-          }}>Turn off</button>
+          }}>Turn off Turbo</button>
+          <Form.Check
+              type="switch"
+              id="custom-switch"
+              label="Peggy knows the secret word"
+              checked={secretWord}
+              onChange={() => setSecretWord(!secretWord)}
+          />
       </div>
   );
 }
 
+// An interval for the Turbo regime
 let interval: NodeJS.Timer
 
-function turnOn() {
-    interval = setInterval(() => {
-        console.log("Turned on")
-    }, 5)
-}
-
 function turnOff() {
+    console.log("Turbo is OFF")
     clearInterval(interval);
     // release our intervalID from the variable
     // interval = null;
