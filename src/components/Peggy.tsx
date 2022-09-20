@@ -185,8 +185,146 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doForthStep()
     }
 
+    function doFirstStep2() {
+        // can this nested "if" be improved?
+        if (!victorPath || victorPath === "") return
+        if (!peggyPath || peggyPath === "") return
+        if (firstStepDone2) return
+
+        // mb below some functions will be executed together because of bad if-statements
+        return1SW1()
+        return1SW2()
+        return1NW1()
+        return1NW2()
+    }
+
+    // goes from A to B if she knows secret word
+    function return1SW1() {
+        if (!secretWord) return
+        if (victorPath === peggyPath) return
+        if (peggyPath === "B") return
+        if (peggy.current.position.z >= 2.375) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z += 0.05
+    }
+
+    // goes from B to A if she knows secret word
+    function return1SW2() {
+        if (!secretWord) return
+        if (victorPath === peggyPath) return
+        if (peggyPath === "A") return
+        if (peggy.current.position.z <= -2.375) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z -= 0.05
+    }
+
+    // goes back by path A
+    function return1NW1() {
+        if (peggyPath === "B") return
+        if (peggy.current.position.z <= -2.375) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z -= 0.05
+    }
+
+    // goes back by path A
+    function return1NW2() {
+        if (peggyPath === "A") return
+        if (peggy.current.position.z >= 2.375) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z += 0.05
+    }
+    
+    function doSecondStep2() {
+        if (!firstStepDone2) return
+        if (secondStepDone2) return
+        if (peggy.current.position.x <= 3) {
+            setSecondStepDone2(true)
+            return
+        }
+        peggy.current.position.x += 0.05
+    }
+    
+    function doThirdStep2() {
+        if (!firstStepDone2) return
+        if (!secondStepDone2) return
+        if (thirdStepDone2) return
+
+        // mb below some functions will be executed together because of bad if-statements
+        return2SW1()
+        return2SW2()
+        return2NW1()
+        return2NW2()
+    }
+
+    // finishes on B path if she knew secret word and went the wrong way first
+    function return2SW1() {
+        if (!secretWord) return
+        if (victorPath === peggyPath) return
+        if (peggyPath === "B") return
+        if (peggy.current.position.z <= 1) {
+            setThirdStepDone2(true)
+            return
+        }
+        peggy.current.position.z -= 0.05
+    }
+
+    // finishes on A path if she knew secret word and went the wrong way first
+    function return2SW2() {
+        if (!secretWord) return
+        if (victorPath === peggyPath) return
+        if (peggyPath === "A") return
+        if (peggy.current.position.z >= -1) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z += 0.05
+    }
+
+    // goes back by path A
+    function return2NW1() {
+        if (peggyPath === "B") return
+        if (peggy.current.position.z >= -1) {
+            setFirstStepDone2(true)
+            return
+        }
+        peggy.current.position.z += 0.05
+    }
+
+    // goes back by path B
+    function return2NW2() {
+        if (peggyPath === "A") return
+        if (peggy.current.position.z <= 1) {
+            setThirdStepDone2(true)
+            return
+        }
+        peggy.current.position.z -= 0.05
+    }
+
+    function doSecondAction () {
+        if (!peggy) return
+        if (!canGo2) return
+        if (secondActionDone) return
+        if (thirdStepDone2) {
+            setSecondActionDone(true)
+            // reachedDoor();
+            return
+        }
+        doFirstStep2()
+        doSecondStep2()
+        doThirdStep2()
+    }
+
     useFrame(({clock}) => {
         if (clicked) doFirstAction()
+        doSecondAction()
     })
 
     return (
