@@ -3,83 +3,34 @@ import React, {MutableRefObject, useRef, useState} from "react";
 import THREE from "three";
 import {useFrame} from "@react-three/fiber";
 
-// function actPath1(peggy: MutableRefObject<THREE.Mesh>, time: number) {
-//
-//     if (peggy.current.position.x <= 2.1 && peggy.current.position.z >= -0.1 && peggy.current.position.z <= 0.1) {
-//         let intervalId = setInterval(() => {
-//             if (peggy.current.position.x >= 3) {
-//                 clearInterval(intervalId)
-//                 let intervalId2 = setInterval(() => {
-//                     if (peggy.current.position.z <= -2.375) {
-//                         clearInterval(intervalId2)
-//                         let intervalId3 = setInterval(() => {
-//                             if (peggy.current.position.x >= 5.8) {
-//                                 clearInterval(intervalId3)
-//                             }
-//                             peggy.current.position.x += 0.1
-//                         }, time)
-//                     }
-//                     peggy.current.position.z -= 0.1
-//                 }, time)
-//             }
-//             peggy.current.position.x += 0.1
-//         }, time)
-//     }
+
+// function peggyReturnsOriginal (peggy: MutableRefObject<THREE.Mesh>, time: number) {
+//     let intervalId = setInterval(() => {
+//         if (peggy.current.position.z >= -0.1 && peggy.current.position.z <= 0.1) {
+//             clearInterval(intervalId)
+//             let intervalId2 = setInterval(() => {
+//                 if (peggy.current.position.x <= 2.1) {
+//                     clearInterval(intervalId2)
+//                 }
+//                 peggy.current.position.x -= 0.1
+//             }, time)
+//         }
+//         if (peggy.current.position.z < 0) {
+//             peggy.current.position.z += 0.1
+//         }
+//         else if (peggy.current.position.z > 0) {
+//             peggy.current.position.z -= 0.1
+//         }
+//     }, time)
 // }
 
-// function peggyReturns1(peggy: MutableRefObject<THREE.Mesh>, secretWord: boolean, time: number) {
-//
-//     if (peggy.current.position.x >= 5.8 && (peggy.current.position.z >= -1 || secretWord)) {
-//         let intervalId = setInterval(() => {
-//             if (peggy.current.position.z <= -2.375) {
-//                 clearInterval(intervalId)
-//                 let intervalId2 = setInterval(() => {
-//                     if (peggy.current.position.x <= 3) {
-//                         clearInterval(intervalId2)
-//                         let intervalId4 = setInterval(() => {
-//                             if (peggy.current.position.z >= -1) {
-//                                 clearInterval(intervalId4)
-//                             }
-//                             peggy.current.position.z += 0.1
-//                         }, time)
-//                     }
-//                     peggy.current.position.x -= 0.1
-//                 }, time)
-//             }
-//             peggy.current.position.z -= 0.1
-//         }, time)
-//     }
-// }
-//
-// function peggyReturns2(peggy: MutableRefObject<THREE.Mesh>, secretWord: boolean, time: number) {
-//
-//     if (peggy.current.position.x >= 5.8 && (peggy.current.position.z <= 1 || secretWord)) {
-//         let intervalId = setInterval(() => {
-//             if (peggy.current.position.z >= 2.375) {
-//                 clearInterval(intervalId)
-//                 let intervalId2 = setInterval(() => {
-//                     if (peggy.current.position.x <= 3) {
-//                         clearInterval(intervalId2)
-//                         let intervalId4 = setInterval(() => {
-//                             if (peggy.current.position.z <= 1) {
-//                                 clearInterval(intervalId4)
-//                             }
-//                             peggy.current.position.z -= 0.1
-//                         }, time)
-//                     }
-//                     peggy.current.position.x -= 0.1
-//                 }, time)
-//             }
-//             peggy.current.position.z += 0.1
-//         }, time)
-//     }
-// }
 
 // export interface PeggyProps{ reachedDoor: () => void, peggyPath: string, canGo1: boolean }
 export interface PeggyProps{ reachedDoor: () => void, cameToVictor: () => void, cameToStart: () => void,
     canGo1: boolean, canGo2: boolean, canGo3: boolean, peggyPath: string, victorPath: string, secretWord: boolean, randomChoose: () => void }
 
-export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomChoose, canGo1, canGo2, canGo3, peggyPath = "", victorPath, secretWord}) => {
+export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomChoose, canGo1, canGo2, canGo3,
+                                                               peggyPath = "", victorPath, secretWord, cameToVictor, cameToStart}) => {
 
     const peggy = useRef<THREE.Mesh>(null!)
 
@@ -96,8 +47,12 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
     const [secondStepDone2, setSecondStepDone2] = useState(false)
     const [thirdStepDone2, setThirdStepDone2] = useState(false)
 
+    const [firstStepDone3, setFirstStepDone3] = useState(false)
+    const [secondStepDone3, setSecondStepDone3] = useState(false)
+
     const [firstActionDone, setFirstActionDone] = useState(false)
     const [secondActionDone, setSecondActionDone] = useState(false)
+    const [thirdActionDone, setThirdActionDone] = useState(false)
 
     const [rightPosOne, setRightPosOne] = useState(false)
 
@@ -111,6 +66,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     function doFirstStep () {
         if (firstStepDone1) return
+        console.log("Got here tho")
         if (!rightPosOne) return
         if (peggy.current.position.x >= 3) {
             setFirstStepDone1(true)
@@ -171,6 +127,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
     function doFirstAction () {
         if (!peggy) return
         if (!canGo1) return
+        if (!clicked) return
         if (firstActionDone) return
         if (forthStepDone1) {
             setFirstActionDone(true)
@@ -224,6 +181,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     // goes back by path A
     function return1NW1() {
+        if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "B") return
         if (peggy.current.position.z <= -2.375) {
             setFirstStepDone2(true)
@@ -234,6 +192,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     // goes back by path A
     function return1NW2() {
+        if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "A") return
         if (peggy.current.position.z >= 2.375) {
             setFirstStepDone2(true)
@@ -249,7 +208,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
             setSecondStepDone2(true)
             return
         }
-        peggy.current.position.x += 0.05
+        peggy.current.position.x -= 0.05
     }
     
     function doThirdStep2() {
@@ -282,7 +241,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         if (victorPath === peggyPath) return
         if (peggyPath === "A") return
         if (peggy.current.position.z >= -1) {
-            setFirstStepDone2(true)
+            setThirdStepDone2(true)
             return
         }
         peggy.current.position.z += 0.05
@@ -290,9 +249,10 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     // goes back by path A
     function return2NW1() {
+        if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "B") return
         if (peggy.current.position.z >= -1) {
-            setFirstStepDone2(true)
+            setThirdStepDone2(true)
             return
         }
         peggy.current.position.z += 0.05
@@ -300,6 +260,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     // goes back by path B
     function return2NW2() {
+        if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "A") return
         if (peggy.current.position.z <= 1) {
             setThirdStepDone2(true)
@@ -314,7 +275,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         if (secondActionDone) return
         if (thirdStepDone2) {
             setSecondActionDone(true)
-            // reachedDoor();
+            cameToVictor()
             return
         }
         doFirstStep2()
@@ -322,9 +283,84 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doThirdStep2()
     }
 
+    function doFirstStep3() {
+        if (firstStepDone3) return
+        if (peggy.current.position.z >= -0.1 && peggy.current.position.z <= -0.1) {
+            setFirstStepDone3(true)
+            return
+        }
+        returnOrig1()
+        returnOrig2()
+    }
+
+    // if she is on path A right now
+    function returnOrig1() {
+        if (peggy.current.position.z >= 0) return
+        peggy.current.position.z += 0.05
+    }
+
+    // if she is on path B right now
+    function returnOrig2() {
+        if (peggy.current.position.z <= 0) return
+        peggy.current.position.z -= 0.05
+    }
+
+    function doSecondStep3() {
+        if (!firstStepDone2) return
+        if (secondStepDone3) return
+        if (peggy.current.position.x <= 2.1) {
+            setSecondStepDone3(true)
+            return
+        }
+        peggy.current.position.x -= 0.05
+    }
+
+    function doThirdAction () {
+        if (!peggy) return
+        if (!canGo3) return
+        if (thirdActionDone) return
+        if (secondStepDone3) {
+            setThirdActionDone(true)
+            console.log("Peggy's at x axis at: ", peggy.current.position.x)
+            cameToStart()
+            return
+        }
+        doFirstStep3()
+        doSecondStep3()
+    }
+
+    function reset() {
+        if (!firstActionDone) return
+        if (!secondActionDone) return
+        if (!thirdActionDone) return
+
+        setClicked(false)
+
+        setRightPosOne(false)
+
+        setFirstStepDone1(false)
+        setSecondStepDone1(false)
+        setThirdStepDone1(false)
+        setForthStepDone1(false)
+
+        setFirstStepDone2(false)
+        setSecondStepDone2(false)
+        setThirdStepDone2(false)
+
+        setFirstStepDone3(false)
+        setSecondStepDone3(false)
+
+        setFirstActionDone(false)
+        setSecondActionDone(false)
+        setThirdActionDone(false)
+
+    }
+
     useFrame(({clock}) => {
-        if (clicked) doFirstAction()
+        doFirstAction()
         doSecondAction()
+        doThirdAction()
+        reset()
     })
 
     return (

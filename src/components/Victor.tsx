@@ -3,46 +3,47 @@ import THREE from "three";
 import {useFrame} from "@react-three/fiber";
 import {RoundedBox} from "@react-three/drei";
 
-// function actVictor(victor: MutablevictorObject<THREE.Mesh>, time: number) {
-//     if (victor.current.position.x >= -1.6 && victor.current.position.z <= -1.9) {
-//         let intervalId = setInterval(() => {
-//             if (victor.current.position.x <= -4) {
-//                 clearInterval(intervalId)
-//                 let intervalId2 = setInterval(() => {
-//                     if (victor.current.position.z >= -0.1) {
-//                         clearInterval(intervalId2)
-//                         let intervalId3 = setInterval(() => {
-//                             if (victor.current.position.x >= 2) {
-//                                 clearInterval(intervalId3)
-//                             }
-//                             victor.current.position.x += 0.2
-//                         }, time)
-//                     }
-//                     victor.current.position.z += 0.1
-//                 }, time)
-//             }
-//             victor.current.position.x -= 0.1
-//         }, time)
-//     }
+// function victorReturns (victor: MutableRefObject<THREE.Mesh>, time: number) {
+//
+//     let intervalId = setInterval(() => {
+//         if (victor.current.position.x <= -4) {
+//             clearInterval(intervalId)
+//             let intervalId2 = setInterval(() => {
+//                 if (victor.current.position.z <= -1.9) {
+//                     clearInterval(intervalId2)
+//                     let intervalId3 = setInterval(() => {
+//                         if (victor.current.position.x >= -1.6) {
+//                             clearInterval(intervalId3)
+//                         }
+//                         victor.current.position.x += 0.1
+//                     }, time)
+//                 }
+//                 victor.current.position.z -= 0.1
+//             }, time)
+//         }
+//         victor.current.position.x -= 0.2
+//     }, time)
 // }
 
 export interface VictorProps {canGo1: boolean, canGo2: boolean,
     reachedPaths: () => void, cameToStart: () => void, victorPath: string}
 
-export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, victorPath}) => {
+export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, victorPath,
+                                                                  cameToStart, reachedPaths}) => {
 
     const victor = useRef<THREE.Mesh>(null!)
+    
+    const [firstStepDone1, setFirstStepDone1] = useState(false)
+    const [secondStepDone1, setSecondStepDone1] = useState(false)
+    const [thirdStepDone1, setThirdStepDone1] = useState(false)
 
-    const [clicked, setClicked] = useState(false)
-
-    const [firstStepDone, setFirstStepDone] = useState(false)
-    const [secondStepDone, setSecondStepDone] = useState(false)
-// const [secondStepDoneB, setSecondStepDoneB] = useState(false)
-    const [thirdStepDone, setThirdStepDone] = useState(false)
-    const [forthStepDone, setForthStepDone] = useState(false)
+    const [firstStepDone2, setFirstStepDone2] = useState(false)
+    const [secondStepDone2, setSecondStepDone2] = useState(false)
+    const [thirdStepDone2, setThirdStepDone2] = useState(false)
 
 
     const [firstActionDone, setFirstActionDone] = useState(false)
+    const [secondActionDone, setSecondActionDone] = useState(false)
 
     const [rightPosOne, setRightPosOne] = useState(false)
 
@@ -55,31 +56,31 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
     }
 
     function doFirstStep() {
-        if (firstStepDone) return
+        if (firstStepDone1) return
         if (!rightPosOne) return
         if (victor.current.position.x <= -4) {
-            setFirstStepDone(true)
+            setFirstStepDone1(true)
             return
         }
         victor.current.position.x -= 0.05
     }
 
     function doSecondStep () {
-        if (!firstStepDone) return
-        if (secondStepDone) return
+        if (!firstStepDone1) return
+        if (secondStepDone1) return
         if (victor.current.position.z >= -0.05) {
-            setSecondStepDone(true)
+            setSecondStepDone1(true)
             return
         }
         victor.current.position.z += 0.05
     }
 
     function doThirdStep () {
-        if (!firstStepDone) return
-        if (!secondStepDone) return
-        if (thirdStepDone) return
+        if (!firstStepDone1) return
+        if (!secondStepDone1) return
+        if (thirdStepDone1) return
         if (victor.current.position.x >= 2) {
-            setThirdStepDone(true)
+            setThirdStepDone1(true)
             return
         }
         victor.current.position.x += 0.05
@@ -89,8 +90,9 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
         if (!victor) return
         if (!canGo1) return
         if (firstActionDone) return
-        if (thirdStepDone) {
+        if (thirdStepDone1) {
             setFirstActionDone(true)
+            reachedPaths()
             return
         }
         checkPosOne()
@@ -99,8 +101,72 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
         doThirdStep()
     }
 
+    function doFirstStep2() {
+        if (firstStepDone2) return
+        if (victor.current.position.x <= -4) {
+            setFirstStepDone2(true)
+            return
+        }
+        victor.current.position.x -= 0.05
+    }
+
+    function doSecondStep2 () {
+        if (!firstStepDone2) return
+        if (secondStepDone2) return
+        if (victor.current.position.z <= -1.9) {
+            setSecondStepDone2(true)
+            return
+        }
+        victor.current.position.z -= 0.05
+    }
+
+    function doThirdStep2 () {
+        if (!firstStepDone2) return
+        if (!secondStepDone2) return
+        if (thirdStepDone2) return
+        if (victor.current.position.x >= -1.6) {
+            setThirdStepDone2(true)
+            return
+        }
+        victor.current.position.x += 0.05
+    }
+
+    function doSecondAction() {
+        if (!victor) return
+        if (!canGo2) return
+        if (secondActionDone) return
+        if (thirdStepDone2) {
+            setSecondActionDone(true)
+            cameToStart()
+            return
+        }
+        doFirstStep2()
+        doSecondStep2()
+        doThirdStep2()
+    }
+
+    function reset() {
+        if (!firstActionDone) return
+        if (!secondActionDone) return
+
+        setRightPosOne(false)
+
+        setFirstStepDone1(false)
+        setSecondStepDone1(false)
+        setThirdStepDone1(false)
+
+        setFirstStepDone2(false)
+        setSecondStepDone2(false)
+        setThirdStepDone2(false)
+
+        setFirstActionDone(false)
+        setSecondActionDone(false)
+    }
+
     useFrame(({clock}) => {
         doFirstAction()
+        doSecondAction()
+        reset()
     })
 
     return (
