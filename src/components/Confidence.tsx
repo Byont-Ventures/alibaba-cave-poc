@@ -3,9 +3,9 @@ import THREE from "three";
 import {Text} from "@react-three/drei";
 import {useFrame} from "@react-three/fiber";
 
-export interface ConfidenceProps {repetitions: number}
+export interface ConfidenceProps {repetitions: number, reset: boolean, resetComplete: () => void}
 
-export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetitions}) => {
+export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetitions, reset, resetComplete}) => {
     const confRef = useRef<THREE.Mesh>(null!)
 
     const [confidence, setConfidence] = useState(0.0)
@@ -25,8 +25,17 @@ export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetiti
         }
     }
 
+    function resetAll() {
+        if (!confRef) return
+        if (!reset) return
+        setConfidence(0)
+        setCheckReps(0)
+        resetComplete()
+    }
+
     useFrame(({clock}) => {
         calculate()
+        resetAll()
     })
 
     return (

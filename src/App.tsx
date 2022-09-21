@@ -3,7 +3,7 @@ import './App.css';
 import {Canvas, ThreeElements, useFrame} from '@react-three/fiber'
 import THREE from 'three';
 import {OrbitControls, RoundedBox, Sphere, Text} from '@react-three/drei';
-import { Form } from 'react-bootstrap';
+import {Button, Form, Modal} from 'react-bootstrap';
 import {Peggy} from "./components/Peggy";
 import {Victor} from "./components/Victor";
 import Door from "./components/Door";
@@ -17,14 +17,16 @@ function victorResponds (peggyPath: string, victorPath: string, secretWord: bool
 }
 
 function App() {
+    const [turboOn, turnTurbo] = useState(false)
+    const [secretWord, setSecretWord] = useState(true);
+
     const [hoveredP1, hoverP1] = useState(false)
     const [hoveredP2, hoverP2] = useState(false)
     const [clickedP1, clickP1] = useState(false)
     const [clickedP2, clickP2] = useState(false)
     const [pathName, setPathName] = useState("")
-    const [turboOn, turnTurbo] = useState(false)
+    const [speed, setSpeed] = useState(0.05)
 
-    const [secretWord, setSecretWord] = useState(true);
     const [victorPath, setVictorPath] = useState("")
     const [peggyPath, setPeggyPath] = useState("")
 
@@ -40,73 +42,16 @@ function App() {
 
     const [repetitions, setRepetitions] = useState(0)
 
-    const victorChoice = useRef<THREE.Mesh>(null!)
+    const [resetPeggy, setResetPeggy] = useState(false)
+    const [resetVictor, setResetVictor] = useState(false)
+    const [resetConf, setResetConf] = useState(false)
+    const [resetDoor, setResetDoor] = useState(false)
 
-    // function executeTurbo() {
-    //     // Peggy chooses a path and follows it and Victor comes to the paths
-    //         interval = setInterval(() => {
-    //             console.log("Turbo is ON")
-    //             let peggyPathVar = ""
-    //             if (victor.current.position.x >= -1.6 && victor.current.position.z <= -1.9) {
-    //                 setVictorPath("")
-    //                 const rand = Math.random()
-    //                 if (rand <= 0.5) {
-    //                     actPath1(peggy, victor, 20)
-    //                     peggyPathVar = "A"
-    //                 } else {
-    //                     actPath2(peggy, victor, 20)
-    //                     peggyPathVar = "B"
-    //                 }
-    //
-    //                 // let intervalId999 = setInterval(() => {
-    //                 //     if (peggyPath === peggyPathVar) {
-    //                 //         clearInterval(intervalId999)
-    //                 //         console.log("Finally set Peggy's Path: ", peggyPath)
-    //                 //     }
-    //                 //     console.log("Just spamming")
-    //                 //     setVictorPath(peggyPathVar)
-    //                 // }, 5)
-    //
-    //
-    //                 // Peggy comes back
-    //                 let intervalId = setInterval(() => {
-    //                     if (victor.current.position.x >= 2) {
-    //                         clearInterval(intervalId)
-    //                         const victorPathVar = choosePathVictor(victor, victorChoice)
-    //                         setPathName(victorPathVar)
-    //                         comeBack(door, peggy, peggyPathVar, victorPathVar, secretWord, 20)
-    //                         // Calculation of confidence
-    //                         let calculated = false
-    //                         let intervalId2 = setInterval(() => {
-    //                             if (peggy.current.position.x <= 3 && !calculated) {
-    //                                 calculated = true
-    //                                 console.log("Got to the calculation")
-    //                                 clearInterval(intervalId2)
-    //                                 const response = victorResponds(peggyPathVar, victorPathVar, secretWord)
-    //                                 setPathName(response)
-    //                                 if (response === "Ok") {
-    //                                     const [newConf, newRep] = calculateConfidence(confidence, repetitions)
-    //                                     setConfidence(newConf)
-    //                                     setRepetitions(newRep)
-    //                                 } else {
-    //                                     setConfidence(0.0)
-    //                                     setRepetitions(0)
-    //                                     clearInterval(interval)
-    //                                     turnTurbo(false)
-    //                                 }
-    //                                 let intervalId10 = setInterval(() => {
-    //                                     if (victor.current.position.x >= 2 && peggy.current.position.x <= 3 && (peggy.current.position.z >= -1 && peggy.current.position.z <= 1)) {
-    //                                         clearInterval(intervalId10)
-    //                                         repeat(victor, peggy, victorChoice, 20)
-    //                                     }
-    //                                 }, 20)
-    //                             }
-    //                         }, 20)
-    //                     }
-    //                 }, 20)
-    //             }
-    //         }, 1000)
-    // }
+    const [showModal, setShowModal] = useState(false)
+
+    const victorChoice = useRef<THREE.Mesh>(null!)
+    const path1 = useRef<THREE.Mesh>(null!)
+    const path2 = useRef<THREE.Mesh>(null!)
 
     function chooseRandomPeggyPath() {
         const rand = Math.random()
@@ -117,17 +62,26 @@ function App() {
         }
     }
 
+    function victorSelectedPath(path: string) {
+        setVictorPath(path)
+        whetherUseDoor(path)
+    }
+
     function chooseRandomVictorPath() {
+        if (!turboOn) return
+        if (peggyCanGo1 || peggyCanGo2 || peggyCanGo3 || victorCanGo1 || victorCanGo2) return
+        if (victorPath === "A" || victorPath === "B") return
         const rand = Math.random()
         if (rand < 0.5) {
-            setVictorPath("A")
+            victorSelectedPath("A")
+            clickP1(true)
         } else {
-            setVictorPath("B")
+            victorSelectedPath("B")
+            clickP2(true)
         }
     }
 
     function whetherUseDoor(victorChoice: string) {
-        // console.log("Peggy and Victor paths are: ", peggyPath, victorPath)
         if (secretWord && victorChoice !== peggyPath) {
             letDoorGo1(true)
             // letPeggyGo2(true)
@@ -140,24 +94,40 @@ function App() {
     function whetherIncrConf() {
         if (!secretWord && victorPath !== peggyPath) {
             setRepetitions(0)
+            setShowModal(true)
+            turnTurbo(false)
         } else {
             setRepetitions(repetitions + 1)
         }
     }
 
+    function executeTurbo() {
+        if (!turboOn) return
+        if (peggyCanGo2 || peggyCanGo3 || victorCanGo1 || victorCanGo2) return
+        letPeggyGo1(true)
+    }
+
+    function resetAll() {
+        turnTurbo(false)
+        setSpeed(0.05)
+        setResetPeggy(true)
+        setResetVictor(true)
+        setResetConf(true)
+        setRepetitions(0)
+        setResetDoor(true)
+    }
+
+    useEffect(() => {
+        executeTurbo()
+        chooseRandomVictorPath()
+    })
 
     return (
       <div style={{height: '100vh'}}>
-        <Canvas
-            onClick={() => {
-                // if (!turboOn) {
-                //     repeat(victor, peggy, victorChoice, 10)
-                // }
-            }}>
+        <Canvas>
             <OrbitControls />
             <ambientLight />
 
-            {/*Entrance*/}
             <RoundedBox args={[5, 0.5, 2]}>
                 <meshStandardMaterial color={'orange'} />
             </RoundedBox>
@@ -165,16 +135,24 @@ function App() {
             {/*Path 1*/}
             <RoundedBox
                 name="path1"
+                ref={path1}
                 args={[4, 0.5, 3]}
                 position={[4.5, 0, -1.5]}
                 onClick={() => {
+                    if (turboOn) return
                     clickP1(!clickedP1)
                     clickP2(false)
-                    setVictorPath("A")
-                    whetherUseDoor("A")
+
+                    victorSelectedPath("A")
                 } }
-                onPointerOut={() => hoverP1(false)}
-                onPointerOver={() => hoverP1(true)}>
+                onPointerOut={() => {
+                    if (turboOn) return
+                    hoverP1(false)
+                }}
+                onPointerOver={() => {
+                    if (turboOn) return
+                    hoverP1(true)
+                }}>
                 <meshStandardMaterial color={(hoveredP1 || clickedP1) ? 'blue' : 'hotpink'} />
             </RoundedBox>
 
@@ -186,24 +164,32 @@ function App() {
             {/*Path 2*/}
             <RoundedBox
                 name="path2"
+                ref={path2}
                 args={[4, 0.5, 3]}
                 position={[4.5, 0, 1.5]}
                 onClick={() => {
+                    if (turboOn) return
                     clickP2(!clickedP2)
                     clickP1(false)
-                    setVictorPath("B")
-                    whetherUseDoor("B")
+
+                    victorSelectedPath("B")
                 }}
-                onPointerOut={() => hoverP2(false)}
-                onPointerOver={() => hoverP2(true)}>
+                onPointerOut={() => {
+                    if (turboOn) return
+                    hoverP2(false)
+                }}
+                onPointerOver={() => {
+                    if (turboOn) return
+                    hoverP2(true)
+                }}>
                 <meshStandardMaterial color={(hoveredP2 || clickedP2) ? 'blue' : 'hotpink'} />
             </RoundedBox>
 
-             {/*The rock*/}
+            {/*The rock*/}
             <RoundedBox
                 args={[2, 2.5, 4]}
                 position={[4.5, 0.99, 0]}
-                >
+            >
                 <meshStandardMaterial color={'brown'} />
             </RoundedBox>
 
@@ -214,28 +200,49 @@ function App() {
 
             {/*Door*/}
             <Door
-                secretWord={secretWord}
-                victorPath={victorPath}
-                peggyPath={peggyPath}
                 canGo1={doorCanGo1}
                 canGo2={doorCanGo2}
+                reset={resetDoor}
+                resetComplete={() => {
+                    setResetDoor(false)
+
+                    letDoorGo1(false)
+                    letDoorGo2(false)
+
+                    clickP1(false)
+                    clickP2(false)
+                }}
                 opened={() => {
                     letDoorGo1(false)
+                    letDoorGo2(false)
                     letPeggyGo2(true)
                 }}
                 closed={() => {
+                    letDoorGo1(false)
                     letDoorGo2(false)
                 }}
             />
 
             {/*That's Peggy*/}
             <Peggy
+                speed={speed}
                 canGo1={peggyCanGo1}
                 canGo2={peggyCanGo2}
                 canGo3={peggyCanGo3}
                 peggyPath={peggyPath}
                 victorPath={victorPath}
                 secretWord={secretWord}
+                turboOn={turboOn}
+                reset={resetPeggy}
+                resetComplete={() => {
+                    setResetPeggy(false)
+
+                    letPeggyGo1(true)
+                    letPeggyGo2(false)
+                    letPeggyGo3(false)
+
+                    setPeggyPath("")
+                }}
                 reachedDoor={() => {
                     letPeggyGo1(false)
                     letVictorGo1(true)
@@ -244,7 +251,10 @@ function App() {
                     whetherIncrConf()
                     letVictorGo2(true)
                     letPeggyGo2(false)
+                    clickP1(false)
+                    clickP2(false)
                     letDoorGo2(true)
+                    setPeggyPath("")
                 }}
                 cameToStart={() => {
                     letPeggyGo1(true)
@@ -259,11 +269,22 @@ function App() {
             <Victor
                 canGo1={victorCanGo1}
                 canGo2={victorCanGo2}
-                victorPath={victorPath}
+                speed={speed}
+                reset={resetVictor}
+                resetComplete={() => {
+                    setResetVictor(false)
+
+                    letVictorGo1(false)
+                    letVictorGo2(false)
+
+                    setVictorPath("")
+                }}
                 reachedPaths={() => {
                     letVictorGo1(false)
                 }}
                 cameToStart={() => {
+                    setVictorPath("")
+                    // letDoorGo2(true)
                     letPeggyGo3(true)
                     letVictorGo2(false)
                 }}
@@ -282,7 +303,9 @@ function App() {
             {/*Confidence meter*/}
             <Confidence
                 repetitions={repetitions}
-                />
+                reset={resetConf}
+                resetComplete={() => setResetConf(false)}
+            />
 
         </Canvas>
           <button
@@ -290,15 +313,18 @@ function App() {
               disabled={turboOn}
               onClick={() => {
                   turnTurbo(true)
-                  // executeTurbo()
+                  setSpeed(0.1)
               }}>Turn on Turbo</button>
 
           <button
               style={{height: "100px", width: "100px", backgroundColor: "#ABCDEF"}}
               onClick={() => {
                   turnTurbo(false)
-                  turnOff()
+                  setSpeed(0.05)
           }}>Turn off Turbo</button>
+          <button
+              style={{height: "100px", width: "100px", backgroundColor: "orangered"}}
+              onClick={() => resetAll()}>Reset</button>
           <Form.Check
               type="switch"
               id="custom-switch"
@@ -306,18 +332,20 @@ function App() {
               checked={secretWord}
               onChange={() => setSecretWord(!secretWord)}
           />
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+              <Modal.Header closeButton>
+                  <Modal.Title>Peggy didn't know the secret word</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>You were trying to find out if Peggy knew the Secret word using Zer-Knowledge Proof and it appears that she didn't</Modal.Body>
+              <Modal.Footer>
+                  {/*<button style={{height: "100px", width: "100px", backgroundColor: "orangered"}}*/}
+                  {/*        onClick={() => resetAll()}>Close</button>*/}
+                  {/*@ts-ignore*/}
+                  <Button variant="danger" onClick={() => setShowModal(false)}>Close</Button>
+              </Modal.Footer>
+          </Modal>
       </div>
   );
-}
-
-// An interval for the Turbo regime
-let interval: NodeJS.Timer
-
-function turnOff() {
-    console.log("Turbo is OFF")
-    clearInterval(interval);
-    // release our intervalID from the variable
-    // interval = null;
 }
 
 export default App;

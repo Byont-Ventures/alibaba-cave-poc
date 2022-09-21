@@ -28,11 +28,11 @@ import {useFrame} from "@react-three/fiber";
 // }
 
 
-export interface DoorProps {secretWord: boolean, victorPath: string, peggyPath: string, canGo1: boolean, canGo2: boolean,
-    opened: () => void, closed: () => void}
+export interface DoorProps {canGo1: boolean, canGo2: boolean,
+    opened: () => void, closed: () => void, reset: boolean, resetComplete: () => void}
 
-export const Door : React.FunctionComponent<DoorProps> = ({secretWord, victorPath, peggyPath,
-                                                              canGo1, canGo2, opened, closed}) => {
+export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
+                                                              opened, closed, reset, resetComplete}) => {
     const door = useRef<THREE.Mesh>(null!)
 
     const [doorOpened, setDoorOpened] = useState(false)
@@ -43,6 +43,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({secretWord, victorPat
         if (doorOpened) return
         if (door.current.position.x <= 4.95) {
             setDoorOpened(true)
+            console.log("The door opened")
             opened()
             return
         }
@@ -55,15 +56,26 @@ export const Door : React.FunctionComponent<DoorProps> = ({secretWord, victorPat
         if (!doorOpened) return
         if (door.current.position.x >= 5.95) {
             setDoorOpened(false)
+            console.log("the door closed")
             closed()
             return
         }
         door.current.position.x += 0.05
     }
 
+    function resetAll() {
+        if (!reset) return
+        door.current.position.x = 6
+        door.current.position.y = 1
+        door.current.position.z = 0
+        console.log("reset the door")
+        resetComplete()
+    }
+
     useFrame(({clock}) => {
         open()
         close()
+        resetAll()
     })
 
     return (

@@ -3,33 +3,11 @@ import THREE from "three";
 import {useFrame} from "@react-three/fiber";
 import {RoundedBox} from "@react-three/drei";
 
-// function victorReturns (victor: MutableRefObject<THREE.Mesh>, time: number) {
-//
-//     let intervalId = setInterval(() => {
-//         if (victor.current.position.x <= -4) {
-//             clearInterval(intervalId)
-//             let intervalId2 = setInterval(() => {
-//                 if (victor.current.position.z <= -1.9) {
-//                     clearInterval(intervalId2)
-//                     let intervalId3 = setInterval(() => {
-//                         if (victor.current.position.x >= -1.6) {
-//                             clearInterval(intervalId3)
-//                         }
-//                         victor.current.position.x += 0.1
-//                     }, time)
-//                 }
-//                 victor.current.position.z -= 0.1
-//             }, time)
-//         }
-//         victor.current.position.x -= 0.2
-//     }, time)
-// }
-
 export interface VictorProps {canGo1: boolean, canGo2: boolean,
-    reachedPaths: () => void, cameToStart: () => void, victorPath: string}
+    reachedPaths: () => void, cameToStart: () => void, speed: number, reset: boolean, resetComplete: () => void}
 
-export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, victorPath,
-                                                                  cameToStart, reachedPaths}) => {
+export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, speed,
+                                                                  cameToStart, reachedPaths, reset, resetComplete}) => {
 
     const victor = useRef<THREE.Mesh>(null!)
     
@@ -62,7 +40,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setFirstStepDone1(true)
             return
         }
-        victor.current.position.x -= 0.05
+        victor.current.position.x -= speed
     }
 
     function doSecondStep () {
@@ -72,7 +50,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setSecondStepDone1(true)
             return
         }
-        victor.current.position.z += 0.05
+        victor.current.position.z += speed
     }
 
     function doThirdStep () {
@@ -83,7 +61,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setThirdStepDone1(true)
             return
         }
-        victor.current.position.x += 0.05
+        victor.current.position.x += speed
     }
 
     function doFirstAction() {
@@ -91,6 +69,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
         if (!canGo1) return
         if (firstActionDone) return
         if (thirdStepDone1) {
+            console.log("Finished the first Action for Victor")
             setFirstActionDone(true)
             reachedPaths()
             return
@@ -107,7 +86,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setFirstStepDone2(true)
             return
         }
-        victor.current.position.x -= 0.05
+        victor.current.position.x -= speed
     }
 
     function doSecondStep2 () {
@@ -117,7 +96,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setSecondStepDone2(true)
             return
         }
-        victor.current.position.z -= 0.05
+        victor.current.position.z -= speed
     }
 
     function doThirdStep2 () {
@@ -128,7 +107,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             setThirdStepDone2(true)
             return
         }
-        victor.current.position.x += 0.05
+        victor.current.position.x += speed
     }
 
     function doSecondAction() {
@@ -136,6 +115,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
         if (!canGo2) return
         if (secondActionDone) return
         if (thirdStepDone2) {
+            console.log("Finished the second Action for Victor")
             setSecondActionDone(true)
             cameToStart()
             return
@@ -145,9 +125,10 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
         doThirdStep2()
     }
 
-    function reset() {
-        if (!firstActionDone) return
-        if (!secondActionDone) return
+    function resetAll() {
+        if ((!firstActionDone || !secondActionDone) && !reset) return
+        // if (!firstActionDone) return
+        // if (!secondActionDone) return
 
         setRightPosOne(false)
 
@@ -161,12 +142,20 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
 
         setFirstActionDone(false)
         setSecondActionDone(false)
+
+        if (reset) {
+            victor.current.position.x = -1.5
+            victor.current.position.y = 1
+            victor.current.position.z = -2
+            resetComplete()
+            console.log("reset all for Victor")
+        }
     }
 
     useFrame(({clock}) => {
         doFirstAction()
         doSecondAction()
-        reset()
+        resetAll()
     })
 
     return (
@@ -174,7 +163,6 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, v
             ref={victor}
             args={[0.75, 0.75, 0.75]}
             position={[-1.5, 1, -2]}
-
         >
             <meshStandardMaterial color={'green'} />
         </RoundedBox>
