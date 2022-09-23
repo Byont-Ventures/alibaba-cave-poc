@@ -1,6 +1,6 @@
 # Getting Started
 
-This is an interactive modal of a well-known Zero-Knowledge Proof example called Ali Baba cave. It involves an interaction between two people: Peggy, a prover, (a red cube) and Victor, a verifier, (a green cube). It shows how Peggy can prove that she knows the word and Victor on the other hand can verify that using Zero-Knowledge Proof. 
+This is an interactive implementation of a well-known Zero-Knowledge Proof example called Ali Baba cave. It involves an interaction between two people: Peggy, a prover, (a red cube) and Victor, a verifier, (a green cube). It shows how Peggy can prove that she knows the word and Victor on the other hand can verify that using Zero-Knowledge Proof. 
 
 This example is a part of series of blogs about Zero-Knowledge Proof which you can find here:
 
