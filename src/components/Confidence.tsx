@@ -11,6 +11,7 @@ export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetiti
     const [confidence, setConfidence] = useState(0.0)
     const [checkReps, setCheckReps] = useState(0)
 
+    // Calculates new confidence
     function calculate() {
         if (!confRef) return
         if (checkReps === repetitions) return
@@ -25,6 +26,7 @@ export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetiti
         }
     }
 
+    // Resets confidence and puts its variables to the initial values
     function resetAll() {
         if (!confRef) return
         if (!reset) return

@@ -14,8 +14,6 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     const peggy = useRef<THREE.Mesh>(null!)
 
-    // const [peggyPath, setPeggyPath] = useState("")
-
     const [clicked, setClicked] = useState(false)
 
     const [firstStepDone1, setFirstStepDone1] = useState(false)
@@ -36,6 +34,9 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     const [rightPosOne, setRightPosOne] = useState(false)
 
+    // *** Peggy's first action animation (that when she chooses a path and goes to the magic door) ***
+
+    // checks if Peggy at the starting position, before letting her move
     function checkPosOne() {
         if (rightPosOne) return
         if (peggy.current.position.x <= 2.2 && peggy.current.position.z >= -0.15 && peggy.current.position.z <= 0.15) {
@@ -122,20 +123,22 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doForthStep()
     }
 
+    // *** The end of Peggy's first action ***
+
+    // *** Peggy's second action animation (that when she comes back with a path that Victor said) ***
+
     function doFirstStep2() {
-        // can this nested "if" be improved?
         if (!victorPath || victorPath === "") return
         if (!peggyPath || peggyPath === "") return
         if (firstStepDone2) return
 
-        // mb below some functions will be executed together because of bad if-statements
         return1SW1()
         return1SW2()
         return1NW1()
         return1NW2()
     }
 
-    // goes from A to B if she knows secret word
+    // goes from A (the path she is at right now) to B (the path Victor said) if she knows the secret word
     function return1SW1() {
         if (!secretWord) return
         if (victorPath === peggyPath) return
@@ -147,7 +150,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         peggy.current.position.z += speed
     }
 
-    // goes from B to A if she knows secret word
+    // goes from B (the path she is at right now) to A (the path Victor said) if she knows secret word
     function return1SW2() {
         if (!secretWord) return
         if (victorPath === peggyPath) return
@@ -159,7 +162,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         peggy.current.position.z -= speed
     }
 
-    // goes back by path A
+    // goes back by path A if she doesn't know the secret work  or if Victor named this path
     function return1NW1() {
         if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "B") return
@@ -170,7 +173,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         peggy.current.position.z -= speed
     }
 
-    // goes back by path A
+    // goes back by path B if she doesn't know the secret work  or if Victor named this path
     function return1NW2() {
         if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "A") return
@@ -196,7 +199,6 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         if (!secondStepDone2) return
         if (thirdStepDone2) return
 
-        // mb below some functions will be executed together because of bad if-statements
         return2SW1()
         return2SW2()
         return2NW1()
@@ -227,7 +229,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         peggy.current.position.z += speed
     }
 
-    // goes back by path A
+    // finishes this action on path A
     function return2NW1() {
         if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "B") return
@@ -238,7 +240,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         peggy.current.position.z += speed
     }
 
-    // goes back by path B
+    // finishes this action on path B
     function return2NW2() {
         if (secretWord && victorPath !== peggyPath) return
         if (peggyPath === "A") return
@@ -263,6 +265,10 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doSecondStep2()
         doThirdStep2()
     }
+
+    // *** The end of Peggy's second action animation ***
+
+    // *** Peggy's third action animation (that when she comes back to her initial position) ***
 
     function doFirstStep3() {
         if (firstStepDone3) return
@@ -312,11 +318,11 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doSecondStep3()
     }
 
+    // *** The end of Peggy's third action animation ***
+
+    // resets all Peggy's actions and puts her on her initial position if "reset" button was triggered
     function resetAll() {
         if ((!firstActionDone || !secondActionDone || !thirdActionDone) && !reset) return
-        // if (!firstActionDone) return
-        // if (!secondActionDone) return
-        // if (!thirdActionDone) return
 
         setClicked(false)
 
@@ -338,8 +344,6 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         setSecondActionDone(false)
         setThirdActionDone(false)
 
-        // console.log("resets Peggy")
-
         if (reset) {
             peggy.current.position.x = 2
             peggy.current.position.y = 1
@@ -350,6 +354,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
 
     }
 
+    // continuously checks if the actions should be executed and executes them if the criteria are met
     useFrame(({clock}) => {
         doFirstAction()
         doSecondAction()
