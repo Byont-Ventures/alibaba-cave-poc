@@ -366,7 +366,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
                 if (turboOn) return
                 setClicked(!clicked)
             }}>
-            <meshStandardMaterial color={'red'} />
+            <meshStandardMaterial color={'#DC143C'} />
         </RoundedBox>
     )
 }

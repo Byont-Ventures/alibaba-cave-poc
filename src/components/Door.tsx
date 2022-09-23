@@ -83,7 +83,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
             ref={door}
             args={[1, 1.5, 0.01]}
             position={[6, 1, 0]}>
-            <meshStandardMaterial color={'purple'} />
+            <meshStandardMaterial color={'#5377EE'} />
         </RoundedBox>
     )
 }

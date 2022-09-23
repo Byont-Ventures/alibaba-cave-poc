@@ -3,18 +3,11 @@ import './App.css';
 import {Canvas, ThreeElements, useFrame} from '@react-three/fiber'
 import THREE from 'three';
 import {OrbitControls, RoundedBox, Sphere, Text} from '@react-three/drei';
-import {Button, Form, Modal} from 'react-bootstrap';
+import {Button, Col, Form, Modal, Row, Stack} from 'react-bootstrap';
 import {Peggy} from "./components/Peggy";
 import {Victor} from "./components/Victor";
 import Door from "./components/Door";
 import Confidence from "./components/Confidence";
-
-function victorResponds (peggyPath: string, victorPath: string, secretWord: boolean) {
-    if (peggyPath !== victorPath && !secretWord) {
-        return "Liar"
-    }
-    return "Ok"
-}
 
 function App() {
     const [turboOn, turnTurbo] = useState(false)
@@ -123,13 +116,17 @@ function App() {
     })
 
     return (
-      <div style={{height: '100vh'}}>
-        <Canvas>
+      <div >
+          <Row className="d-flex justify-content-center mt-2">
+              <div style={{height: "60vh", width: "100vw"}}>
+        <Canvas
+            style={{ backgroundColor: "#040B10"}}
+            camera={{position: [-4, 6, 7]}} >
             <OrbitControls />
             <ambientLight />
 
             <RoundedBox args={[5, 0.5, 2]}>
-                <meshStandardMaterial color={'orange'} />
+                <meshStandardMaterial color={'#C5EE53'} />
             </RoundedBox>
 
             {/*Path 1*/}
@@ -153,11 +150,11 @@ function App() {
                     if (turboOn) return
                     hoverP1(true)
                 }}>
-                <meshStandardMaterial color={(hoveredP1 || clickedP1) ? 'blue' : 'hotpink'} />
+                <meshStandardMaterial color={(hoveredP1 || clickedP1) ? '#16324B' : '#BBD8F1'} />
             </RoundedBox>
 
             {/*Path 1 Name*/}
-            <Text position={[4.5, 0.5, -5]} fontSize={5} rotation={[0, 90, 0]} color={'#008081'}>
+            <Text position={[4.5, 0.5, -5]} fontSize={5} rotation={[0, 90, 0]} color={'#6495ED'}>
                 A
             </Text>
 
@@ -182,7 +179,7 @@ function App() {
                     if (turboOn) return
                     hoverP2(true)
                 }}>
-                <meshStandardMaterial color={(hoveredP2 || clickedP2) ? 'blue' : 'hotpink'} />
+                <meshStandardMaterial color={(hoveredP2 || clickedP2) ? '#16324B' : 'hotpink'} />
             </RoundedBox>
 
             {/*The rock*/}
@@ -190,11 +187,11 @@ function App() {
                 args={[2, 2.5, 4]}
                 position={[4.5, 0.99, 0]}
             >
-                <meshStandardMaterial color={'brown'} />
+                <meshStandardMaterial color={'#593392'} />
             </RoundedBox>
 
             {/*Path 2 Name*/}
-            <Text position={[4.5, 0.5, 5]} fontSize={5} rotation={[0, 200, 0]} color={'#008081'}>
+            <Text position={[4.5, 0.5, 5]} fontSize={5} rotation={[0, 200, 0]} color={'#6495ED'}>
                 B
             </Text>
 
@@ -290,16 +287,6 @@ function App() {
                 }}
             />
 
-            {/*Victor's lyrics*/}
-            <Text
-                position={[2.25, 2, 0]}
-                visible={false}
-                ref={victorChoice}
-                fontSize={1.5}
-                color={'red'}>
-                {pathName}
-            </Text>
-
             {/*Confidence meter*/}
             <Confidence
                 repetitions={repetitions}
@@ -308,38 +295,56 @@ function App() {
             />
 
         </Canvas>
-          <button
-              style={{height: "100px", width: "100px", backgroundColor: "#FEDCBA"}}
-              disabled={turboOn}
-              onClick={() => {
-                  turnTurbo(true)
-                  setSpeed(0.1)
-              }}>Turn on Turbo</button>
+              </div>
+          </Row>
+          <Row className="mx-3 px-3 mt-4">
+              <Col xs={3} className="d-flex justify-content-center">
+                  <Form.Check
+                      type="switch"
+                      id="custom-switch"
+                      label="Peggy knows the secret word"
+                      // style={{color: "white"}}
+                      checked={secretWord}
+                      onChange={() => setSecretWord(!secretWord)}
+                  />
+              </Col>
+              <Col xs={9} className="d-flex justify-content-end">
+                  <Stack direction="horizontal" gap={3}>
+                      {/*@ts-ignore*/}
+                      <Button
+                          style={{height: "75px", width: "150px"}}
+                          variant="success"
+                          disabled={turboOn}
+                          onClick={() => {
+                              turnTurbo(true)
+                              setSpeed(0.1)
+                          }}>Turn on Turbo</Button>
 
-          <button
-              style={{height: "100px", width: "100px", backgroundColor: "#ABCDEF"}}
-              onClick={() => {
-                  turnTurbo(false)
-                  setSpeed(0.05)
-          }}>Turn off Turbo</button>
-          <button
-              style={{height: "100px", width: "100px", backgroundColor: "orangered"}}
-              onClick={() => resetAll()}>Reset</button>
-          <Form.Check
-              type="switch"
-              id="custom-switch"
-              label="Peggy knows the secret word"
-              checked={secretWord}
-              onChange={() => setSecretWord(!secretWord)}
-          />
+                      {/*@ts-ignore*/}
+                      <Button
+                          style={{height: "75px", width: "150px"}}
+                          variant="warning"
+                          onClick={() => {
+                              turnTurbo(false)
+                              setSpeed(0.05)
+                          }}>Turn off Turbo</Button>
+
+                      {/*@ts-ignore*/}
+                      <Button
+                          style={{height: "75px", width: "150px"}}
+                          variant="danger"
+                          onClick={() => {
+                              resetAll()
+                          }}>Reset</Button>
+                  </Stack>
+              </Col>
+          </Row>
           <Modal show={showModal} onHide={() => setShowModal(false)}>
               <Modal.Header closeButton>
                   <Modal.Title>Peggy didn't know the secret word</Modal.Title>
               </Modal.Header>
               <Modal.Body>You were trying to find out if Peggy knew the Secret word using Zer-Knowledge Proof and it appears that she didn't</Modal.Body>
               <Modal.Footer>
-                  {/*<button style={{height: "100px", width: "100px", backgroundColor: "orangered"}}*/}
-                  {/*        onClick={() => resetAll()}>Close</button>*/}
                   {/*@ts-ignore*/}
                   <Button variant="danger" onClick={() => setShowModal(false)}>Close</Button>
               </Modal.Footer>

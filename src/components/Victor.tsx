@@ -164,7 +164,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, s
             args={[0.75, 0.75, 0.75]}
             position={[-1.5, 1, -2]}
         >
-            <meshStandardMaterial color={'green'} />
+            <meshStandardMaterial color={'#32CD32'} />
         </RoundedBox>
 
     )

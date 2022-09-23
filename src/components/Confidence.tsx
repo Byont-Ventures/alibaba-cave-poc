@@ -41,9 +41,9 @@ export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetiti
     return (
         <Text
             ref={confRef}
-            position={[2.25, 7, 0]}
+            position={[2.25, 5.5, 0]}
             fontSize={1}
-            color={'black'}>
+            color={'white'}>
             Confidence: {confidence}%
         </Text>
     )
