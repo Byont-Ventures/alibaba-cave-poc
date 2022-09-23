@@ -1,32 +1,7 @@
-import React, {MutableRefObject, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import {RoundedBox} from "@react-three/drei";
 import THREE from "three";
 import {useFrame} from "@react-three/fiber";
-
-
-// function goThroughDoor(door: MutableRefObject<THREE.Mesh>, peggy: MutableRefObject<THREE.Mesh>, peggyPath: string, victorPath: string, secretWord: boolean, time: number) {
-//     let intervalId = setInterval(() => {
-//         if (door.current.position.x <= 4.98) {
-//             clearInterval(intervalId)
-//             if (peggyPath === "B") {
-//                 // peggyReturns1(peggy, secretWord, time)
-//             }
-//             else {
-//                 // peggyReturns2(peggy, secretWord, time)
-//             }
-//             let intervalId2 = setInterval(() => {
-//                 if (peggy.current.position.z >= 2.375 || peggy.current.position.z <= -2.375 || peggy.current.position.z <= 3) {
-//                     if (door.current.position.x >= 5.98) {
-//                         clearInterval(intervalId2)
-//                     }
-//                     door.current.position.x += 0.02
-//                 }
-//             }, time)
-//         }
-//         door.current.position.x -= 0.02
-//     }, time)
-// }
-
 
 export interface DoorProps {canGo1: boolean, canGo2: boolean,
     opened: () => void, closed: () => void, reset: boolean, resetComplete: () => void}
@@ -75,6 +50,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
         resetComplete()
     }
 
+    // continuously checks if the actions should be executed and executes them if the criteria are met
     useFrame(({clock}) => {
         open()
         close()

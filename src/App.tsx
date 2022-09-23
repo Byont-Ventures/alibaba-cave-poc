@@ -1,6 +1,6 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {Canvas, ThreeElements, useFrame} from '@react-three/fiber'
+import {Canvas} from '@react-three/fiber'
 import THREE from 'three';
 import {OrbitControls, RoundedBox, Sphere, Text} from '@react-three/drei';
 import {Button, Col, Form, Modal, Row, Stack} from 'react-bootstrap';
@@ -17,7 +17,6 @@ function App() {
     const [hoveredP2, hoverP2] = useState(false)
     const [clickedP1, clickP1] = useState(false)
     const [clickedP2, clickP2] = useState(false)
-    const [pathName, setPathName] = useState("")
     const [speed, setSpeed] = useState(0.05)
 
     const [victorPath, setVictorPath] = useState("")
@@ -42,10 +41,10 @@ function App() {
 
     const [showModal, setShowModal] = useState(false)
 
-    const victorChoice = useRef<THREE.Mesh>(null!)
     const path1 = useRef<THREE.Mesh>(null!)
     const path2 = useRef<THREE.Mesh>(null!)
 
+    // chooses a random path that Peggy will follow
     function chooseRandomPeggyPath() {
         const rand = Math.random()
         if (rand < 0.5) {
@@ -55,11 +54,13 @@ function App() {
         }
     }
 
+    // executes actions that should happen after Victor chooses a path
     function victorSelectedPath(path: string) {
         setVictorPath(path)
         whetherUseDoor(path)
     }
 
+    // chooses a random path for Victor, when the Turbo regime is On
     function chooseRandomVictorPath() {
         if (!turboOn) return
         if (peggyCanGo1 || peggyCanGo2 || peggyCanGo3 || victorCanGo1 || victorCanGo2) return
@@ -74,16 +75,16 @@ function App() {
         }
     }
 
+    // triggers magic door opening if all criteria met, otherwise triggers next Peggy move
     function whetherUseDoor(victorChoice: string) {
         if (secretWord && victorChoice !== peggyPath) {
             letDoorGo1(true)
-            // letPeggyGo2(true)
         } else {
             letPeggyGo2(true)
         }
-        // sends Peggy back, according to the chosen Path (that returns Victor's response)
     }
 
+    // checks if the confidence should be increased and triggers needed actions accordingly
     function whetherIncrConf() {
         if (!secretWord && victorPath !== peggyPath) {
             setRepetitions(0)
@@ -94,12 +95,14 @@ function App() {
         }
     }
 
+    // executes Turbo functions
     function executeTurbo() {
         if (!turboOn) return
         if (peggyCanGo2 || peggyCanGo3 || victorCanGo1 || victorCanGo2) return
         letPeggyGo1(true)
     }
 
+    // resets Peggy, Victor, Door, Confidence and turns off Turbo
     function resetAll() {
         turnTurbo(false)
         setSpeed(0.05)
@@ -110,6 +113,7 @@ function App() {
         setResetDoor(true)
     }
 
+    // helps to continuously execute Turbo functions
     useEffect(() => {
         executeTurbo()
         chooseRandomVictorPath()
@@ -125,6 +129,7 @@ function App() {
             <OrbitControls />
             <ambientLight />
 
+            {/*Main path*/}
             <RoundedBox args={[5, 0.5, 2]}>
                 <meshStandardMaterial color={'#C5EE53'} />
             </RoundedBox>
@@ -201,6 +206,7 @@ function App() {
                 canGo2={doorCanGo2}
                 reset={resetDoor}
                 resetComplete={() => {
+                    // when the Door is reset, put all related values to their initial state
                     setResetDoor(false)
 
                     letDoorGo1(false)
@@ -210,11 +216,13 @@ function App() {
                     clickP2(false)
                 }}
                 opened={() => {
+                    // when the door opens, stops it and triggers Peggy's next move
                     letDoorGo1(false)
                     letDoorGo2(false)
                     letPeggyGo2(true)
                 }}
                 closed={() => {
+                    // when the door closes, stops it
                     letDoorGo1(false)
                     letDoorGo2(false)
                 }}
@@ -232,6 +240,7 @@ function App() {
                 turboOn={turboOn}
                 reset={resetPeggy}
                 resetComplete={() => {
+                    // when Peggy is reset, put all related values to their initial state
                     setResetPeggy(false)
 
                     letPeggyGo1(true)
@@ -241,10 +250,12 @@ function App() {
                     setPeggyPath("")
                 }}
                 reachedDoor={() => {
+                    // when reaches the door, stops and triggers Victor's next move
                     letPeggyGo1(false)
                     letVictorGo1(true)
                 }}
                 cameToVictor={() => {
+                    // when comes to Victor, triggers a number of actions
                     whetherIncrConf()
                     letVictorGo2(true)
                     letPeggyGo2(false)
@@ -254,10 +265,12 @@ function App() {
                     setPeggyPath("")
                 }}
                 cameToStart={() => {
+                    // when comes back to the initial position, triggers Peggy's first action
                     letPeggyGo1(true)
                     letPeggyGo3(false)
                 }}
                 randomChoose={() => {
+                    // triggers a random choosing of a path  for Peggy
                     chooseRandomPeggyPath()
                 }}
             />
@@ -269,6 +282,7 @@ function App() {
                 speed={speed}
                 reset={resetVictor}
                 resetComplete={() => {
+                    // when Victor is reset, put all related values to their initial state
                     setResetVictor(false)
 
                     letVictorGo1(false)
@@ -277,11 +291,12 @@ function App() {
                     setVictorPath("")
                 }}
                 reachedPaths={() => {
+                    // when reaches the paths, stops
                     letVictorGo1(false)
                 }}
                 cameToStart={() => {
+                    // when comes to the initial position, lets Peggy move and resets Victor's path choice
                     setVictorPath("")
-                    // letDoorGo2(true)
                     letPeggyGo3(true)
                     letVictorGo2(false)
                 }}
@@ -291,7 +306,10 @@ function App() {
             <Confidence
                 repetitions={repetitions}
                 reset={resetConf}
-                resetComplete={() => setResetConf(false)}
+                resetComplete={() => {
+                    // when the Confidence is reset, put all related values to their initial state
+                    setResetConf(false)
+                }}
             />
 
         </Canvas>
@@ -303,7 +321,6 @@ function App() {
                       type="switch"
                       id="custom-switch"
                       label="Peggy knows the secret word"
-                      // style={{color: "white"}}
                       checked={secretWord}
                       onChange={() => setSecretWord(!secretWord)}
                   />
@@ -339,6 +356,8 @@ function App() {
                   </Stack>
               </Col>
           </Row>
+          
+          {/*This modal appears when Victor finds out that Peggy doesn't know the secret word*/}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
               <Modal.Header closeButton>
                   <Modal.Title>Peggy didn't know the secret word</Modal.Title>
