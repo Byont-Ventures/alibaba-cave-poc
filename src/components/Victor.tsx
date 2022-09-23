@@ -1,4 +1,4 @@
-import React, {MutableRefObject, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import THREE from "three";
 import {useFrame} from "@react-three/fiber";
 import {RoundedBox} from "@react-three/drei";
@@ -25,6 +25,9 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, s
 
     const [rightPosOne, setRightPosOne] = useState(false)
 
+    // *** Victor's first action animation (that when he comes to the paths) ***
+
+    // checks if Peggy at the starting position, before letting her move
     function checkPosOne() {
         if (rightPosOne) return
         if (victor.current.position.x >= -1.6 && victor.current.position.z <= -1.9) {
@@ -80,6 +83,10 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, s
         doThirdStep()
     }
 
+    // *** The end of Victor's first action ***
+
+    // *** Victor's second action animation (that when he comes back to his initial position) ***
+
     function doFirstStep2() {
         if (firstStepDone2) return
         if (victor.current.position.x <= -4) {
@@ -125,10 +132,11 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, s
         doThirdStep2()
     }
 
+    // *** The end of Victor's second action ***
+
+    // resets all Victor's actions and puts him on his initial position if "reset" button was triggered
     function resetAll() {
         if ((!firstActionDone || !secondActionDone) && !reset) return
-        // if (!firstActionDone) return
-        // if (!secondActionDone) return
 
         setRightPosOne(false)
 
@@ -152,6 +160,7 @@ export const Victor : React.FunctionComponent<VictorProps> = ({canGo1, canGo2, s
         }
     }
 
+    // continuously checks if the actions should be executed and executes them if the criteria are met
     useFrame(({clock}) => {
         doFirstAction()
         doSecondAction()

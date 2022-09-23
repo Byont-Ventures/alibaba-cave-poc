@@ -1,5 +1,5 @@
 import {RoundedBox} from "@react-three/drei";
-import React, {MutableRefObject, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import THREE from "three";
 import {useFrame} from "@react-three/fiber";
 
@@ -266,7 +266,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doThirdStep2()
     }
 
-    // *** The end of Peggy's second action animation ***
+    // *** The end of Peggy's second action ***
 
     // *** Peggy's third action animation (that when she comes back to her initial position) ***
 
@@ -318,7 +318,7 @@ export const Peggy: React.FunctionComponent<PeggyProps> = ({reachedDoor, randomC
         doSecondStep3()
     }
 
-    // *** The end of Peggy's third action animation ***
+    // *** The end of Peggy's third action ***
 
     // resets all Peggy's actions and puts her on her initial position if "reset" button was triggered
     function resetAll() {

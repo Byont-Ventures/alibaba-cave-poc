@@ -35,6 +35,7 @@ export const Confidence : React.FunctionComponent<ConfidenceProps> = ({ repetiti
         resetComplete()
     }
 
+    // continuously checks if the actions should be executed and executes them if the criteria are met
     useFrame(({clock}) => {
         calculate()
         resetAll()
