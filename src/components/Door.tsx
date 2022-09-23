@@ -37,6 +37,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
 
     const [doorOpened, setDoorOpened] = useState(false)
 
+    // Opens the  door
     function open() {
         if (!door) return
         if (!canGo1) return
@@ -50,6 +51,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
         door.current.position.x -= 0.05
     }
 
+    // Closes the door
     function close() {
         if (!door) return
         if (!canGo2) return
@@ -63,6 +65,7 @@ export const Door : React.FunctionComponent<DoorProps> = ({canGo1, canGo2,
         door.current.position.x += 0.05
     }
 
+    // Resets the door and puts it to the initial state
     function resetAll() {
         if (!reset) return
         door.current.position.x = 6
