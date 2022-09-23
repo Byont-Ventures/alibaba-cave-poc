@@ -356,7 +356,7 @@ function App() {
                   </Stack>
               </Col>
           </Row>
-          
+
           {/*This modal appears when Victor finds out that Peggy doesn't know the secret word*/}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
               <Modal.Header closeButton>
