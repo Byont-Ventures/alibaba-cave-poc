@@ -1,46 +1,37 @@
-# Getting Started with Create React App
+# Getting Started
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is an interactive modal of a well-known Zero-Knowledge Proof example called Ali Baba cave. It involves an interaction between two people: Peggy, a prover, (a red cube) and Victor, a verifier, (a green cube). It shows how Peggy can prove that she knows the word and Victor on the other hand can verify that using Zero-Knowledge Proof. 
 
-## Available Scripts
+This example is a part of series of blogs about Zero-Knowledge Proof which you can find here:
 
-In the project directory, you can run:
+[Series about Zero-Knowledge Proof](https://www.byont.io/blog/zero-knowledge-proof-how-it-works-and-the-alibaba-cave-experiment)
 
-### `npm start`
+# How it works
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To begin with, there are two ways of using this modal: a normal way and a Turbo way. 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Normal regime
 
-### `npm test`
+1. Click on Peggy (a red cube). She will then follow a randomly chosen path. After that Victor (a green cube) will come to the paths.
+2. Now click one of the paths you want to check from Victor's perspective. Then Peggy will come back using this path or another of if she got unlucky and didn't know the secret word.
+3. According to how Peggy returned (with the path that Victor named or not), the Confidence (the one above the "cave") will either rise (if Peggy returned with the right path) or drop to 0% (if Peggy returned with the wrong path). Confidence shows Victor's confidence in the fact that Peggy really knows the secret word.
+4. After that both Victor and Peggy will return to their initial positions. 
+5. Now repeat the stops from step 1 to continue the modal.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Turbo regime
 
-### `npm run build`
+Below the 3D scene you can see one toggle button and three normal buttons. To turn Turbo regime click "Turn ob Turbo" button. Then all the steps mentioned in the Normal regime will be executed automatically and faster. To turn the Turbo off you can press "Turn off Turbo" button. Then you can interact with the modal as in the Normal regime.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Additional features
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Among "Turn on Turbo" and "Turn off Turbo" buttons you can see two more buttons: a toggle button and a "Reset" button.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Toggle button
 
-### `npm run eject`
+Toggle button, as its label says, lets a user turn on and off the fact that Peggy knows the secret word. 
+When the toggle button is "switched on" (with blue color), it means that Peggy knows the secret word and that she will always come back with a path that Victor names. If the toggle button is "switched off" (with white/no color), at some point Victor will learn that Peggy doesn't know the secret word and then a corresponding modal will appear.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Reset button
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+"Reset" button allows a user to reset everything to its initial state, meaning that Peggy, Victor and the Door will go to their initial positions and the Confidence will be set back to 0. 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
