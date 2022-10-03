@@ -1,6 +1,6 @@
 # Getting Started
 
-This is an interactive implementation of a well-known Zero-Knowledge Proof example called Ali Baba cave. It involves an interaction between two people: Peggy, a prover (a red cube), and Victor, a verifier (a green cube). It shows how Peggy can prove that she knows the word, and Victor, on the other hand, can verify that using Zero-Knowledge Proof.
+This is an interactive modal of a well-known Zero-Knowledge Proof example called Ali Baba cave. It involves an interaction between two people: Peggy, a prover, (a red cube) and Victor, a verifier, (a green cube). It shows how Peggy can prove that she knows the secret word that opens the magic door, and Victor on the other hand can verify that using Zero-Knowledge Proof. 
 
 This example is a part of a series of blogs about Zero-Knowledge Proof which you can find here:
 
@@ -12,11 +12,11 @@ To begin with, there are two ways of using this modal: a normal way and a Turbo 
 
 ## Normal regime
 
-1. Click on Peggy (a red cube). She will then follow a randomly chosen path. After that, Victor (a green cube) will come to the paths.
-2. Click one of the paths you want to check from Victor's perspective. Then Peggy will return using this path or another if she gets unlucky and doesn’t know the secret word.
-3. According to how Peggy returned (with the path that Victor named or not), the Confidence (the one above the "cave") will either rise (if Peggy returned with the right path) or drop to 0% (if Peggy returned with the wrong path). Confidence shows Victor's confidence that Peggy knows the secret word.
-4. Victor and Peggy will return to their initial positions.
-5. Now repeat the stops from step 1 to continue the modal.
+1. Click on Peggy (a red cube). She will then follow a randomly chosen path. After that Victor (a green cube) will come to the paths.
+2. Now click one of the paths you want to check from Victor's perspective. Then Peggy will come back using this path or another of if she got unlucky and didn't know the secret word.
+3. According to how Peggy returned (with the path that Victor named or not), the Confidence (the one above the "cave") will either rise (if Peggy returned with the right path) or drop to 0% (if Peggy returned with the wrong path). Confidence shows Victor's confidence in the fact that Peggy really knows the secret word.
+4. After that both Victor and Peggy will return to their initial positions. 
+5. Repeat the steps from step 1.
 
 ## Turbo regime
 
